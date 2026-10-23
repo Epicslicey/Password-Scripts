@@ -1,0 +1,15 @@
+$NewPass = ConvertTo-SecureString "CPClubOnTop!" -AsPlainText -Force
+$Skip = @($env:USERNAME, "DefaultAccount", "WDAGUtilityAccount")
+
+Get-LocalUser | ForEach-Object {
+    if ($Skip -contains $_.Name) {
+        Write-Host "Skipping: $($_.Name)"
+        return
+    }
+    try {
+        Set-LocalUser -Name $_.Name -Password $NewPass -ErrorAction Stop
+        Write-Host "Changed: $($_.Name)"
+    } catch {
+        Write-Host "FAILED: $($_.Name) - $($_.Exception.Message)"
+    }
+}
