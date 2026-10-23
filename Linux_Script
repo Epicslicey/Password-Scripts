@@ -1,0 +1,16 @@
+#!/bin/bash
+NEWPASS='CPClubOnTop!'
+ME="${SUDO_USER:-$USER}"
+
+# Human users (UID 1000-60000) that have a real login shell
+awk -F: '$3 >= 1000 && $3 < 60000 && $7 !~ /(nologin|false)$/ {print $1}' /etc/passwd | while read -r user; do
+    if [ "$user" = "$ME" ]; then
+        echo "Skipping current user: $user"
+        continue
+    fi
+    if echo "$user:$NEWPASS" | chpasswd; then
+        echo "Changed: $user"
+    else
+        echo "FAILED: $user"
+    fi
+done
